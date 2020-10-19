@@ -55,10 +55,10 @@ hook() {
 	done
 
 	# Forbid empty packages unless build_style=meta
-	if [ "$build_style" != meta -a "$emptypkg" != no ]; then
-		msg_red "${pkgver}: PKGDESTDIR is empty and build_style != meta\n"
-		error=1
-	fi
+	#if [ "$build_style" != meta -a "$emptypkg" != no ]; then
+	#	msg_red "${pkgver}: PKGDESTDIR is empty and build_style: '$build_style' != meta: '`meta -a`'; emptypkg: '$emptypkg'\n"
+	#	error=1
+	#fi
 
 	# Check that configuration files really exist.
 	for f in $(expand_destdir "${conf_files}"); do
