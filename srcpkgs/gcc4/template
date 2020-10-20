@@ -1,8 +1,9 @@
 # Template build file for 'gcc4'
 pkgname=gcc4
-_majorver=4.8
+_mainver=4
+_majorver=${_mainver}.8
 version=${_majorver}.5
-revision=1
+revision=2
 wrksrc=gcc-${version}
 hostmakedepends="perl flex wget tar gmp gmpxx gmpxx-devel"
 makedepends="zlib-devel gmp-devel mpfr-devel mpc ppl-devel>=1.0 cloog cloog-devel isl-devel libfl-devel libmpc-devel>=1.0.1_2"
@@ -88,7 +89,7 @@ do_configure() {
 		--enable-checking=release --disable-libstdcxx-pch \
 		--with-ppl --enable-cloog-backend=isl --enable-libstdcxx-time \
 		--enable-tls --enable-languages=${_langs} ${_args} \
-		--disable-libsanitizer
+		--disable-libsanitizer --enable-version-specific-runtime-libs --program-suffix=-${_mainver}
 }
 
 do_build() {
@@ -113,7 +114,9 @@ do_install() {
 
 	# Ditto for c++ headers.
 	mkdir -p ${DESTDIR}/usr/include/c++/${_majorver}
-	mv ${DESTDIR}/usr/include/c++/${version} \
+	
+	#mv ${DESTDIR}/usr/include/c++/${version} \
+	mv ${DESTDIR}/usr/lib/gcc/${_triplet}/${_majorver}/include/ \
 		${DESTDIR}/usr/include/c++/${_majorver}
 	cd ${DESTDIR}/usr/include/c++ && ln -sf ${_majorver} ${version}
 
@@ -167,249 +170,4 @@ do_install() {
 
 	# Conflicting manpages, provided by gcc
 #	rm -rf ${DESTDIR}/usr/share/man/man7
-}
-
-# Multilib packages
-if [ "$XBPS_TARGET_MACHINE" = "x86_64" ]; then
-
-gcc4-c++-multilib_package() {
-	lib32disabled=yes
-	depends=""
-	short_desc="GCC C++ compiler (multilib files)"
-	noverifyrdeps=yes
-
-}
-
-gcc4-multilib_package() {
-	lib32disabled=yes
-	depends="gcc>=${_majorver} "
-	short_desc="GCC C compiler (multilib files)"
-	noverifyrdeps=yes
-
-#	pkg_install() {
-#		#vmove usr/lib/gcc/${_triplet}/${_majorver}/32
-#		#vmove "usr/lib32/libssp*.a"
-#		vinstall ${wrksrc}/host-${_triplet}/gcc/specs 644 usr/lib/gcc/${_triplet}/${_majorver}
-#	}
-}
-
-#gcc4-objc-multilib_package() {
-#	depends="gcc-multilib>=${_majorver} gcc-objc>=${_majorver} "
-#	short_desc="The GNU Objective-C compiler (multilib files)"
-#	noverifyrdeps=yes
-#
-#	pkg_install() {
-#		vmkdir usr/lib/gcc/${_triplet}/${_majorver}/32
-#		mv ${DESTDIR}/usr/lib32/libobjc*.a \
-#			${PKGDESTDIR}/usr/lib/gcc/${_triplet}/${_majorver}/32
-#	}
-#}
-
-
-fi # !x86_64
-
-# Disabled packages in cross builds.
-#if [ -z "$CROSS_BUILD" ]; then
-
-
-
-#gcc4-go_package() {
-#	depends="gcc4>=${_majorver} libgo-devel>=${_majorver}"
-#	short_desc="GCC Go compiler frontend"
-#
-#	pkg_install() {
-#		for f in gccgo ${_triplet}-gccgo; do
-#			vmove usr/bin/${f}
-#		done
-#		vmove usr/lib/gcc/${_triplet}/${_majorver}/go1
-#		vmove usr/share/info/gccgo.info
-#		vmove usr/share/man/man1/gccgo.1
-#		vmove usr/lib/go
-#	}
-#}
-
-#gcc4-objc++_package() {
-#	depends="gcc4-c++>=${_majorver} gcc-objc>=${_majorver}"
-#	short_desc="GCC Objective-C++ support"
-#
-#	pkg_install() {
-#		vmove usr/lib/gcc/${_triplet}/${_majorver}/cc1objplus
-#	}
-#}
-
-#gcc4-objc_package() {
-#	depends="gcc4>=${_majorver} libobjc>=${_majorver}"
-#	short_desc="GCC Objective-C support"
-#
-#	pkg_install() {
-#		vmove usr/lib/gcc/${_triplet}/${_majorver}/include/objc
-#		vmove usr/lib/gcc/${_triplet}/${_majorver}/cc1obj
-#	}
-#}
-
-
-
-#libgo-devel_package() {
-#	depends="libgo>=${_majorver}"
-#	short_desc="GCC Go library ${version} shared library support - development files"
-#
-#	pkg_install() {
-#		vmove usr/lib/libgo.a
-#		vmove usr/lib/libgobegin.a
-#	}
-#}
-
-#libgo_package() {
-#	short_desc="Go library ${version} shared library support"
-#
-#	pkg_install() {
-#		vmove "usr/lib/libgo.so*"
-#		vinstall ${wrksrc}/COPYING.RUNTIME 644 usr/share/licenses/$pkgname RUNTIME.LIBRARY.EXCEPTION
-#	}
-#}
-
-#libobjc-devel_package() {
-#	depends="libobjc>=${_majorver}"
-#	short_desc="GCC Objective-C shared library support (development files)"
-
-#	pkg_install() {
-#		vmove "usr/lib/libobjc.*a"
-#	}
-#}
-
-#libobjc_package() {
-#	short_desc="GCC Objective-C shared library support"
-#
-#	pkg_install() {
-#		vmove "usr/lib/libobjc.so*"
-#		vinstall ${wrksrc}/COPYING.RUNTIME 644 usr/share/licenses/$pkgname RUNTIME.LIBRARY.EXCEPTION
-#	}
-#}
-
-#libquadmath-devel_package() {
-#	depends="libquadmath>=${_majorver}"
-#	short_desc="GCC quadmath shared support library (development files)"
-#
-#	pkg_install() {
-#		vmove "/usr/lib/gcc/${_triplet}/${_majorver}/include/quadmath*"
-#		vmove "usr/lib/libquadmath*.a"
-#		vmove usr/share/info/libquadmath.info
-#	}
-#}
-
-#libquadmath_package() {
-#	short_desc="GCC quad match ${version} shared library support"
-#
-#	pkg_install() {
-#		vmove "usr/lib/libquadmath.so*"
-#		vinstall ${wrksrc}/COPYING.RUNTIME 644 usr/share/licenses/$pkgname RUNTIME.LIBRARY.EXCEPTION
-#	}
-#}
-
-#fi # !CROSS_BUILD
-
-libgcc4_package() {
-	short_desc="GCC version ${version} shared library support"
-	noverifyrdeps=yes
-
-#	pkg_install() {
-#		vmove "usr/lib/libgcc_s.so*"
-#		vinstall ${wrksrc}/COPYING.RUNTIME 644 usr/share/licenses/$pkgname RUNTIME.LIBRARY.EXCEPTION
-#	}
-}
-
-#libgomp-devel_package() {
-#	depends="libgomp>=${_majorver}"
-#	short_desc="GCC OpenMP v3.0 shared support library - development files"
-#
-#	pkg_install() {
-#		vmove usr/lib/libgomp.a
-#		vmove usr/share/info/libgomp.info
-#	}
-#}
-
-#libgomp_package() {
-#	short_desc="GCC OpenMP v3.0 shared support library"
-#	replaces="gcc4>=4.6.3<4.6.3_3"
-#
-#	pkg_install() {
-#		vmove usr/lib/gcc/${_triplet}/${_majorver}/include/omp.h
-#		vmove "usr/lib/libgomp*.so*"
-#		vmove usr/lib/libgomp.spec
-#		vinstall ${wrksrc}/COPYING.RUNTIME 644 usr/share/licenses/$pkgname RUNTIME.LIBRARY.EXCEPTION
-#	}
-#}
-
-#libitm_package() {
-#	short_desc="GCC Transactional Memory support library"
-#
-#	pkg_install() {
-#		vmove "usr/lib/libitm.*"
-#		vmove usr/share/info/libitm.info
-#	}
-#}
-
-
-#libssp-devel_package() {
-#	depends="glibc-devel libssp>=${_majorver}"
-#	short_desc="GCC SSP library support"
-#
-#	pkg_install() {
-#		vmove "usr/lib/libssp*.a"
-#		vmove usr/lib/gcc/${_triplet}/${_majorver}/include/ssp
-#	}
-#}
-
-#libssp_package() {
-#	short_desc="GCC SSP shared library support"
-#
-#	pkg_install() {
-#		vmove "usr/lib/libssp.so*"
-#		vinstall ${wrksrc}/COPYING.RUNTIME 644 usr/share/licenses/$pkgname RUNTIME.LIBRARY.EXCEPTION
-#	}
-#}
-
-libstdc++4-devel_package() {
-	depends="libstdc++>=${_majorver}"
-	short_desc="GCC Standard C++ Library (development files)"
-
-	pkg_install() {
-		vmove "usr/lib/libstdc++.*a"
-		vmove "usr/lib/libsupc++.*"
-		vmove usr/include/c++/${_majorver}/${version}/${_triplet}/bits
-		vmove "usr/include/c++/${_majorver}/${version}/*.h"
-	}
-}
-
-libstdc++4_package() {
-	short_desc="GCC Standard C++ Library"
-
-	pkg_install() {
-		vmove "usr/lib/libstdc++.so*"
-#		vmove usr/share/locale/fr/LC_MESSAGES/libstdc++.mo
-#		vmove usr/share/locale/de/LC_MESSAGES/libstdc++.mo
-		vinstall ${wrksrc}/COPYING.RUNTIME 644 usr/share/licenses/$pkgname RUNTIME.LIBRARY.EXCEPTION
-	}
-}
-
-gcc4-c++_package() {
-	lib32disabled=yes
-	depends="gcc>=${_majorver} libstdc++-devel>=${_majorver}"
-	short_desc="GCC C++ support"
-
-	pkg_install() {
-		for f in g++ c++ ${_triplet}-g++ ${_triplet}-c++; do
-			vmove usr/bin/${f}
-		done
-		vmove usr/lib/gcc/${_triplet}/${_majorver}/cc1plus
-		vmove usr/share/man/man1/g++.1
-	}
-}
-
-gcc4_package() {
-	lib32disabled=yes
-	depends="binutils libgomp>=${_majorver} libitm>=${_majorver} libssp-devel>=${_majorver}"
-	pkg_install() {
-		vmove usr
-	}
 }
