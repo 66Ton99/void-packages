@@ -3,10 +3,10 @@ pkgname=gcc4
 _mainver=4
 _majorver=${_mainver}.8
 version=${_majorver}.5
-revision=2
+revision=3
 wrksrc=gcc-${version}
 hostmakedepends="perl flex wget tar gmp gmpxx gmpxx-devel"
-makedepends="zlib-devel gmp-devel mpfr-devel mpc ppl-devel>=1.0 cloog cloog-devel isl-devel libfl-devel libmpc-devel>=1.0.1_2"
+makedepends="gcc zlib-devel gmp-devel mpfr-devel mpc ppl-devel>=1.0 cloog cloog-devel isl-devel libfl-devel libmpc-devel>=1.0.1_2"
 short_desc="The GNU C Compiler"
 maintainer="Juan RP <xtraeme@gmail.com>"
 homepage="http://gcc.gnu.org"
@@ -19,7 +19,7 @@ nopie=yes
 case "$XBPS_TARGET_MACHINE" in
 	i686) _triplet="i686-pc-linux-gnu";;
 	i686-musl) _triplet="i686-linux-musl";;
-	x86_64) _triplet="x86_64-pc-linux-gnu";;
+	x86_64) _triplet="x86_64-unknown-linux-gnu";;
 	x86_64-musl) _triplet="x86_64-linux-musl";;
 	armv5tel) _triplet="arm-linux-gnueabi";;
 	armv5tel-musl) _triplet="arm-linux-musleabi";;
@@ -89,7 +89,8 @@ do_configure() {
 		--enable-checking=release --disable-libstdcxx-pch \
 		--with-ppl --enable-cloog-backend=isl --enable-libstdcxx-time \
 		--enable-tls --enable-languages=${_langs} ${_args} \
-		--disable-libsanitizer --enable-version-specific-runtime-libs --program-suffix=-${_mainver}
+		--disable-libsanitizer --enable-version-specific-runtime-libs \
+		--program-suffix=-${_mainver} --with-gxx-include-dir=/usr/include/c++/${version}
 }
 
 do_build() {
@@ -115,15 +116,14 @@ do_install() {
 	# Ditto for c++ headers.
 	mkdir -p ${DESTDIR}/usr/include/c++/${_majorver}
 	
-	#mv ${DESTDIR}/usr/include/c++/${version} \
-	mv ${DESTDIR}/usr/lib/gcc/${_triplet}/${_majorver}/include/ \
+	mv ${DESTDIR}/usr/include/c++/${version} \
 		${DESTDIR}/usr/include/c++/${_majorver}
 	cd ${DESTDIR}/usr/include/c++ && ln -sf ${_majorver} ${version}
 
 	# cc symlink.
-	cd ${DESTDIR}/usr/bin && ln -sf gcc cc
+	cd ${DESTDIR}/usr/bin && ln -sf gcc-${_mainver} cc-${_mainver}
 	# rpcgen wants /lib/cpp, make a symlink.
-	cd ${DESTDIR}/usr/lib && ln -sf ../bin/cpp .
+	cd ${DESTDIR}/usr/lib && ln -sf ../bin/cpp-${_mainver} .
 
 	rm -f ${DESTDIR}/usr/lib64
 
