@@ -516,9 +516,12 @@ libbabl-0.1.so.0 babl-0.1.16_1
 libbamf3.so.2 bamf-0.5.1_1
 libicuio.so.67 icu-libs-67.1_1
 libicui18n.so.67 icu-libs-67.1_1
+libicui18n.so.50 icu50-libs-50.1.2_6
 libicudata.so.67 icu-libs-67.1_1
 libicutu.so.67 icu-libs-67.1_1
+libicutu.so.50 icu50-libs-50.1.2_6
 libicuuc.so.67 icu-libs-67.1_1
+libicuuc.so.50 icu50-libs-50.1.2_6
 libicutest.so.67 icu-libs-67.1_1
 libaspell.so.15 libaspell-0.60.8_2
 libpspell.so.15 libaspell-0.60.8_2

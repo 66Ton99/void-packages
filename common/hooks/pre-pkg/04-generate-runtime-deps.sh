@@ -101,7 +101,7 @@ hook() {
             # Ignore libs by current pkg
             soname=$(find ${PKGDESTDIR} -name "$f")
             if [ -z "$soname" ]; then
-                msg_red_nochroot "   SONAME: $f <-> UNKNOWN PKG PLEASE FIX!\n"
+                msg_red_nochroot "   SONAME: $f <-> UNKNOWN PKG PLEASE FIX!1\n"
                 broken=1
             else
                 echo "   SONAME: $f <-> $pkgname (ignored)"
@@ -130,7 +130,7 @@ hook() {
         _pkgname=$($XBPS_UHELPER_CMD getpkgname "${_rdep}" 2>/dev/null)
         _rdepver=$($XBPS_UHELPER_CMD getpkgversion "${_rdep}" 2>/dev/null)
         if [ -z "${_pkgname}" -o -z "${_rdepver}" ]; then
-            msg_red_nochroot "   SONAME: $f <-> UNKNOWN PKG PLEASE FIX!\n"
+            msg_red_nochroot "   SONAME: $f <-> UNKNOWN PKG PLEASE FIX!2\n"
             broken=1
             continue
         fi

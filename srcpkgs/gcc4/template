@@ -3,7 +3,7 @@ pkgname=gcc4
 _mainver=4
 _majorver=${_mainver}.8
 version=${_majorver}.5
-revision=3
+revision=4
 wrksrc=gcc-${version}
 hostmakedepends="perl flex wget tar gmp gmpxx gmpxx-devel"
 makedepends="gcc zlib-devel gmp-devel mpfr-devel mpc ppl-devel>=1.0 cloog cloog-devel isl-devel libfl-devel libmpc-devel>=1.0.1_2"
@@ -90,7 +90,8 @@ do_configure() {
 		--with-ppl --enable-cloog-backend=isl --enable-libstdcxx-time \
 		--enable-tls --enable-languages=${_langs} ${_args} \
 		--disable-libsanitizer --enable-version-specific-runtime-libs \
-		--program-suffix=-${_mainver} --with-gxx-include-dir=/usr/include/c++/${version}
+		--program-suffix=-${_mainver} --with-gxx-include-dir=/usr/include/c++/${version} \
+ 		--build=${_triplet}
 }
 
 do_build() {
@@ -114,8 +115,6 @@ do_install() {
 	cd ${DESTDIR}/usr/lib/gcc/${_triplet} && ln -sf ${_majorver} ${version}
 
 	# Ditto for c++ headers.
-	mkdir -p ${DESTDIR}/usr/include/c++/${_majorver}
-	
 	mv ${DESTDIR}/usr/include/c++/${version} \
 		${DESTDIR}/usr/include/c++/${_majorver}
 	cd ${DESTDIR}/usr/include/c++ && ln -sf ${_majorver} ${version}
