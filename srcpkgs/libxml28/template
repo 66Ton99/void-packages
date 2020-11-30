@@ -23,6 +23,7 @@ pre_configure() {
 	CC=gcc-4
 	
 	# remove option not supported by clang
+	-no-pie
 	CFLAGS=${CFLAGS/-fstack-clash-protection/}
 	CXXFLAGS=${CXXFLAGS/-fstack-clash-protection/}
 	

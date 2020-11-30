@@ -1,0 +1,82 @@
+# Template file for 'pcre'
+pkgname=pcre4
+version=8.32
+wrksrc=pcre-${version}
+revision=3
+build_style=gnu-configure
+configure_args="--enable-utf8 --enable-unicode-properties --with-pic
+ --enable-pcregrep-libz --enable-pcregrep-libbz2 --enable-newline-is-anycrlf
+ --enable-pcretest-libedit --enable-jit --enable-static --disable-default-pie --program-suffix=4"
+makedepends="gcc4 automake libtool bzip2-devel libedit-devel zlib-devel"
+short_desc="Perl Compatible Regular Expressions"
+maintainer="Orphaned <orphan@voidlinux.org>"
+license="BSD-3-Clause"
+homepage="http://www.pcre.org/"
+distfiles="https://ftp.pcre.org/pub/pcre/pcre-${version}.tar.bz2"
+checksum=a913fb9bd058ef380a2d91847c3c23fcf98e92dc3b47cd08a53c021c5cde0f55
+nopie_files="/usr/bin/pcretest4 /usr/bin/pcregrep4"
+
+case "$XBPS_TARGET_MACHINE" in
+	mips*) ;; # Without stack for recursion the mips builds fail
+	*) configure_args+=" --disable-stack-for-recursion" ;;
+esac
+
+post_install() {
+	vlicense LICENCE
+}
+
+#if [ "$CROSS_BUILD" ]; then
+	hostmakedepends=""
+	pre_configure() {
+		
+		CXX=g++-4
+		CC=gcc-4
+		# Mips needs a hint if an FPU is available or not
+		case "$XBPS_TARGET_MACHINE" in
+			mips-musl|mipsel-musl)
+				CFLAGS="-DSLJIT_IS_FPU_AVAILABLE=0"
+				;;
+			mipshf-musl|mipselhf-musl)
+				CFLAGS="-DSLJIT_IS_FPU_AVAILABLE=1"
+				;;
+		esac
+		
+		# remove option not supported by clang
+		CFLAGS=${CFLAGS/-fstack-clash-protection/}
+		CFLAGS=${CFLAGS/-no-pie/}
+		CXXFLAGS=${CXXFLAGS/-fstack-clash-protection/}
+		CXXFLAGS=${CXXFLAGS/-no-pie/}
+		autoreconf -fi
+	}
+#fi
+
+libpcrecpp4_package() {
+	short_desc+=" - C++ shared libraries"
+	pkg_install() {
+		vmove "usr/lib/libpcrecpp.so.*"
+	}
+}
+
+libpcre4_package() {
+	short_desc+=" - shared libraries"
+	replaces="pcre4<8.11"
+	pkg_install() {
+		vmove "usr/lib/libpcre.so.*"
+		vmove "usr/lib/libpcreposix.so.*"
+	}
+}
+
+pcre4-devel_package() {
+	depends="zlib-devel bzip2-devel libpcre4>=${version}_${revision} libpcrecpp4>=${version}_${revision}"
+	short_desc+=" - development files"
+	pkg_install() {
+		vmove usr/bin/pcre-config4
+		vmove usr/include
+		vmove "usr/lib/*.a"
+		vmove "usr/lib/*.so"
+		vmove usr/lib/pkgconfig
+		vmove usr/share/man/man1/pcre-config4.1
+		vmove usr/share/man/man3
+		vmove usr/share/doc
+	}
+}
